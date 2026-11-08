@@ -2,9 +2,6 @@
 
 A robust and scalable e-commerce backend application developed using **Java and Spring Boot**. ShopSphere provides RESTful APIs to support customers, sellers, and administrators in managing an online shopping platform.
 
-## 🎥 Project Demo
-
-Watch the complete demonstration of ShopSphere below.
 
 <!-- Upload your MP4 video here using GitHub's README editor. GitHub will generate a video attachment URL. -->
 
