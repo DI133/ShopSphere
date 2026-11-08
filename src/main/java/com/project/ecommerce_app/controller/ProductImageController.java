@@ -16,20 +16,22 @@ public class ProductImageController {
     @Autowired
     private ProductImageService imageService;
 
+    // add images to product
     @PostMapping("/{productId}")
-    public ResponseEntity<String> uploadImage(
+    public ResponseEntity<List<ProductImage>> uploadImages(
             @PathVariable Integer productId,
-            @RequestParam("image") MultipartFile file) {
-
-        ProductImage image = imageService.saveImage(productId, file);
-        return ResponseEntity.ok("image uploaded");
+            @RequestParam("images") MultipartFile[] images
+    ) {
+        return ResponseEntity.ok(imageService.saveImage(productId, images));
     }
 
+    // get images of product
     @GetMapping("/{productId}")
     public ResponseEntity<List<ProductImage>> getImagesByProductId(@PathVariable Integer productId) {
         return ResponseEntity.ok(imageService.getImagesByProductId(productId));
     }
 
+    // delete image of product
     @DeleteMapping("/{imageId}")
     public ResponseEntity<Void> deleteImage(@PathVariable Integer imageId) {
         imageService.deleteImage(imageId);

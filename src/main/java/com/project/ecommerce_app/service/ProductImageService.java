@@ -5,7 +5,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 
 public interface ProductImageService {
-    ProductImage saveImage(Integer productId, MultipartFile file);
+    List<ProductImage> saveImage(Integer productId, MultipartFile[] files);
     List<ProductImage> getImagesByProductId(Integer productId);
     void deleteImage(Integer imageId);
 }

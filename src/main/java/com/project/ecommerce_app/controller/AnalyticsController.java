@@ -15,12 +15,14 @@ import org.springframework.web.bind.annotation.RestController;
 public class AnalyticsController {
     private final AnalyticsService analyticsService;
 
+    // get analytics details of user by userId
     @GetMapping("/{userId}")
     public ResponseEntity<SellerStats> getStats(@PathVariable Integer userId) {
         SellerStats stats = analyticsService.getSellerStats(userId);
         return ResponseEntity.ok(stats);
     }
 
+    // create seller stats of a particular user
     @GetMapping("/create/{userId}")
     public ResponseEntity<String> calculateAndSaveSellerStats(@PathVariable Integer userId){
         analyticsService.calculateAndSaveSellerStats(userId);

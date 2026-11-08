@@ -23,11 +23,13 @@ public class Payment {
     @JsonManagedReference
     private Order order;
 
+
     private String paymentMethod; // e.g., Credit Card, PayPal
 
     @Enumerated(EnumType.STRING)
     private PaymentStatus paymentStatus; // e.g., SUCCESS, PENDING, FAILED
 
+    private String transactionId;
     private LocalDateTime paymentDate;
 
 //    private String razorpayOrderId;

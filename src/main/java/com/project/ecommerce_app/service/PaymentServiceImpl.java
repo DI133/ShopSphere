@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
-
+import java.util.UUID;
 
 
 @Service
@@ -27,10 +27,12 @@ public class PaymentServiceImpl implements PaymentService{
         Order newOrder = orderService.placeOrder(customerId, address);
         Payment payment = new Payment();
         payment.setOrder(newOrder);
-        payment.setPaymentStatus(PaymentStatus.success);
+        payment.setPaymentStatus(PaymentStatus.pending);
         payment.setPaymentDate(LocalDateTime.now());
-        payment.setPaymentMethod("UPI");
-        return paymentRepository.save(payment);
+        payment.setPaymentMethod("Card");
+        payment.setTransactionId(UUID.randomUUID().toString());
+        paymentRepository.save(payment);
+        return payment;
     }
 
     @Override
@@ -41,5 +43,28 @@ public class PaymentServiceImpl implements PaymentService{
     @Override
     public List<Payment> getAllPayments() {
         return paymentRepository.findAll();
+    }
+
+    @Override
+    public Payment markPaymentSuccess(Integer paymentId) {
+
+        Payment payment = paymentRepository.findById(paymentId)
+                .orElseThrow(() -> new RuntimeException("Payment not found"));
+
+        payment.setPaymentStatus(PaymentStatus.success);
+
+        return paymentRepository.save(payment);
+    }
+
+    @Override
+    public Payment markPaymentFailed(Integer paymentId) {
+
+        Payment payment = paymentRepository.findById(paymentId)
+                .orElseThrow(() -> new RuntimeException("Payment not found"));
+
+        payment.setPaymentStatus(PaymentStatus.failed);
+
+        orderService.cancelOrder(payment.getPayment_id());
+        return paymentRepository.save(payment);
     }
 }

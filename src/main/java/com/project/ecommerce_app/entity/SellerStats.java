@@ -30,7 +30,4 @@ public class SellerStats {
     @OneToOne
     @JoinColumn(name = "user_id", nullable = false)
     User user;
-
-
-
 }

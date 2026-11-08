@@ -16,12 +16,13 @@ import java.util.Optional;
 public class CartController {
     private final CartService cartService;
 
-    //create or get the user cart
+    // get the user's cart by userId
     @GetMapping("/{userId}")
     public ResponseEntity<Optional<Cart>> getCart(@PathVariable Integer userId){
         return ResponseEntity.ok(Optional.ofNullable(cartService.getCartByUserId(userId)));
     }
 
+    // add product to cart
     @PostMapping("/add")
     public ResponseEntity<String> addToCart(
             @RequestParam Integer userId,
@@ -31,7 +32,7 @@ public class CartController {
         return ResponseEntity.ok("Product added to cart successfully");
     }
 
-    //to get cart items
+    //to get cart items of a user by userId
     @GetMapping("/items/{userId}")
     public ResponseEntity<List<CartItem>> getItems(@PathVariable Integer userId){
         List<CartItem> items = cartService.getCartItems(userId);

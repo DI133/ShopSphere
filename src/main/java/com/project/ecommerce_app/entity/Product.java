@@ -23,12 +23,13 @@ public class Product {
     private String description;
     private Double price;
     private Integer stock;
-    private Integer reviewsCount;
+    private Integer reviewsCount = 0;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name= "category_id", nullable= false)
-    @JsonBackReference
+    //@JsonBackReference
     private Category category;
+
 
     @OneToMany(mappedBy="product", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference("product-images")

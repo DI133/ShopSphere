@@ -1,6 +1,6 @@
 package com.project.ecommerce_app.service;
 
-import com.project.ecommerce_app.dto.AddressDto;
+import com.project.ecommerce_app.dto.*;
 import com.project.ecommerce_app.entity.*;
 import com.project.ecommerce_app.repository.*;
 import jakarta.transaction.Transactional;
@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 
 @Service
 @Transactional
-public class OrderServiceImpl implements OrderService{
+public class OrderServiceImpl implements OrderService {
     @Autowired
     private OrderRepository orderRepository;
     @Autowired
@@ -27,6 +27,10 @@ public class OrderServiceImpl implements OrderService{
     private UserRepository userRepository;
     @Autowired
     private AnalyticsService analyticsService;
+
+    @Autowired
+    private  ProductRepository productRepository;
+
     @Override
     @Transactional
     public Order placeOrder(Integer userId, AddressDto address) {
@@ -50,6 +54,19 @@ public class OrderServiceImpl implements OrderService{
         order.setPhone(address.phone);
         // Convert CartItems to OrderItems
         List<OrderItem> orderItems = cart.getCartItems().stream().map(cartItem -> {
+
+            Product product = cartItem.getProduct();
+            if(product.getStock() < cartItem.getQuantity()){
+                throw new RuntimeException(
+                        "Not enough stock for product: " + product.getName()
+                );
+            }
+
+            //reduce stock by added quantity
+
+            product.setStock(product.getStock() - cartItem.getQuantity());
+            productRepository.save(product);
+
             OrderItem orderItem = new OrderItem();
             orderItem.setOrder(order);
             orderItem.setProduct(cartItem.getProduct());
@@ -65,11 +82,6 @@ public class OrderServiceImpl implements OrderService{
         // Save order and order items
         orderRepository.save(order);
         orderItemRepository.saveAll(orderItems);
-
-        // Clear cart after order is placed
-//        cartItemRepository.deleteByCartId(cart.getCart_id());
-//        List<CartItem> cartItems = cartItemRepository.findByCart_Cart_id(cart.getCart_id());
-//        cartItemRepository.deleteAll(cartItems);
 
 
         return order;
@@ -88,47 +100,128 @@ public class OrderServiceImpl implements OrderService{
     }
 
 
-
     @Override
     @Transactional
     public void cancelOrder(Integer orderId) {
-        if (orderRepository.existsById(orderId)) {
-            orderRepository.deleteById(orderId);
-        } else {
-            throw new RuntimeException("Order not found");
+
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new RuntimeException("Order not found"));
+
+        // Restore stock for each ordered item
+        for (OrderItem item : order.getOrderItems()) {
+
+            Product product = item.getProduct();
+
+            int restoredStock = product.getStock() + item.getQuantity();
+            product.setStock(restoredStock);
+
+            // update product stock
+            productRepository.save(product);
+
+            // update analytics (remove sales effect)
+            analyticsService.recalculateSellerStats(product.getUser().getUser_id());
         }
+
+        // delete the order
+        orderRepository.delete(order);
     }
 
     @Override
     @Transactional
-    public List<Order> getOrdersByUserId(Integer userId){
+    public List<Order> getOrdersByUserId(Integer userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found with ID: " + userId));
         return orderRepository.findByUser(user);
     }
 
-    @Override
-    @Transactional
-    public List<OrderItem> getNewOrderItemsForSeller(Integer sellerId) {
-        return orderItemRepository.findPendingOrderItemsBySellerId(sellerId);
-    }
 
     @Override
     @Transactional
-    public List<OrderItem> getPastOrderItemsForSeller(Integer sellerId) {
-        return orderItemRepository.findCompletedOrderItemsBySellerId(sellerId);
+    public List<SellerOrderItemDto> getNewOrderItemsForSeller(Integer sellerId) {
+
+        List<OrderItem> items = orderItemRepository
+                .findPendingOrderItemsBySellerId(sellerId);
+
+        return items.stream().map(item -> {
+
+            Order order = item.getOrder();
+            User user = order.getUser();
+
+            return new SellerOrderItemDto(
+                    item.getItem_id(),
+                    item.getProduct().getName(),
+                    item.getQuantity(),
+
+                    user.getUsername(),
+                    user.getEmail(),
+
+                    order.getStreet(),
+                    order.getCity(),
+                    order.getState(),
+                    order.getZipcode(),
+                    order.getPhone()
+            );
+
+        }).toList();
+    }
+
+
+    @Override
+    @Transactional
+    public List<SellerOrderItemDto> getPastOrderItemsForSeller(Integer sellerId){
+        List<OrderItem> items = orderItemRepository
+                .findCompletedOrderItemsBySellerId(sellerId);
+
+        return items.stream().map(item -> {
+
+            Order order = item.getOrder();
+            User user = order.getUser();
+
+            return new SellerOrderItemDto(
+                    item.getItem_id(),
+                    item.getProduct().getName(),
+                    item.getQuantity(),
+
+                    user.getUsername(),
+                    user.getEmail(),
+
+                    order.getStreet(),
+                    order.getCity(),
+                    order.getState(),
+                    order.getZipcode(),
+                    order.getPhone()
+            );
+
+        }).toList();
     }
 
     @Override
     @Transactional
     public String markOrderItemAsCompleted(Integer orderItemId) {
-        OrderItem orderItem = orderItemRepository.findById(orderItemId)
-                .orElseThrow(() -> new RuntimeException("Order not found"));
 
-        orderItem.setComplete(true);
-        orderItemRepository.save(orderItem);
+        OrderItem item = orderItemRepository.findById(orderItemId)
+                .orElseThrow(() -> new RuntimeException("Order item not found"));
+
+        // mark item complete
+        item.setComplete(true);
+        orderItemRepository.save(item);
+
         analyticsService.updateSellerStats(orderItemId);
-        return "Order Item marked as completed";
+
+        Order order = item.getOrder();
+
+        // fetch all items of this order
+        List<OrderItem> items = orderItemRepository.findByOrder(order);
+
+        boolean allCompleted = items.stream()
+                .allMatch(i -> Boolean.TRUE.equals(i.isComplete()));
+
+        if (allCompleted) {
+            order.setStatus(OrderStatus.delivered);
+            orderRepository.save(order);
+        }
+        return "";
     }
+
 }
 

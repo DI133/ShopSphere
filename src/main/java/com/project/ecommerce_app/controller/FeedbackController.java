@@ -15,6 +15,7 @@ public class FeedbackController {
     @Autowired
     private FeedbackService feedbackService;
 
+    // add feedback for a product
     @PostMapping("/submit")
     public ResponseEntity<Feedback> submitFeedback(
             @RequestParam Integer userId,
@@ -24,12 +25,14 @@ public class FeedbackController {
         return ResponseEntity.ok(feedback);
     }
 
+    // delete feedback (not used)
     @DeleteMapping("/{feedbackId}")
     public ResponseEntity<Void> deleteFeedback(@PathVariable Integer feedbackId) {
         feedbackService.deleteFeedback(feedbackId);
         return ResponseEntity.noContent().build();
     }
 
+    // get feedback of product by it's id
     @GetMapping("/product/{productId}")
     public ResponseEntity<List<Feedback>> getFeedbacksForProduct(@PathVariable Integer productId) {
         List<Feedback> feedbacks = feedbackService.getFeedbacksForProduct(productId);

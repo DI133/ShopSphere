@@ -10,6 +10,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -25,30 +26,39 @@ public class ProductImageServiceImpl implements ProductImageService {
     private final String UPLOAD_DIR = "uploads/"; // Ensure this folder exists or use dynamic path
 
     @Override
-    public ProductImage saveImage(Integer productId, MultipartFile file) {
+    public List<ProductImage> saveImage(Integer productId, MultipartFile[] files) {
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new RuntimeException("Product not found"));
 
-        String uploadDir = new File("uploads").getAbsolutePath(); // default under project root
+        String uploadDir = new File("uploads").getAbsolutePath();
         File uploadFolder = new File(uploadDir);
 
         if (!uploadFolder.exists()) {
-            uploadFolder.mkdirs(); // create directory if not exists
-        }
-        String filename = UUID.randomUUID() + "_" + file.getOriginalFilename();
-        File destination = new File(uploadFolder, filename);
-
-        try {
-            file.transferTo(destination);
-        } catch (IOException e) {
-            throw new RuntimeException("Failed to upload image", e);
+            uploadFolder.mkdirs();
         }
 
-        ProductImage image = new ProductImage();
-        image.setImage_url("/" + UPLOAD_DIR + filename);
-        image.setProduct(product);
+        List<ProductImage> savedImages = new ArrayList<>();
 
-        return imageRepository.save(image);
+        for (MultipartFile file : files) {
+            if (file != null && !file.isEmpty()) {
+                String filename = UUID.randomUUID() + "_" + file.getOriginalFilename();
+                File destination = new File(uploadFolder, filename);
+
+                try {
+                    file.transferTo(destination);
+                } catch (IOException e) {
+                    throw new RuntimeException("Failed to upload image", e);
+                }
+
+                ProductImage image = new ProductImage();
+                image.setImage_url("/" + UPLOAD_DIR + filename);
+                image.setProduct(product);
+
+                savedImages.add(imageRepository.save(image));
+            }
+        }
+
+        return savedImages;
     }
 
     @Override

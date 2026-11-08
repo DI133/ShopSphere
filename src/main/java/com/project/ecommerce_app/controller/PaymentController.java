@@ -16,19 +16,29 @@ public class PaymentController {
 
     private final PaymentService paymentService;
 
-    // Process a payment for a customer
+    // process a payment for a customer (it also places the order).
     @PostMapping("/process/{customerId}")
     public ResponseEntity<Payment> processPayment(@PathVariable Integer customerId, @RequestBody AddressDto address) {
         return ResponseEntity.ok(paymentService.processPayment(customerId, address));
     }
 
-    // Get payment details by payment ID
+    @PutMapping("/{paymentId}/success")
+    public ResponseEntity<Payment> markPaymentSuccess(@PathVariable Integer paymentId) {
+        return ResponseEntity.ok(paymentService.markPaymentSuccess(paymentId));
+    }
+
+    @PutMapping("/{paymentId}/failed")
+    public ResponseEntity<Payment> markPaymentFailed(@PathVariable Integer paymentId) {
+        return ResponseEntity.ok(paymentService.markPaymentFailed(paymentId));
+    }
+
+    // get payment details by payment ID
     @GetMapping("/{paymentId}")
     public ResponseEntity<Optional<Payment>> getPaymentById(@PathVariable Integer paymentId) {
         return ResponseEntity.ok(paymentService.getPaymentById(paymentId));
     }
 
-    // Get all payments
+    // get all payments
     @GetMapping
     public ResponseEntity<List<Payment>> getAllPayments() {
         return ResponseEntity.ok(paymentService.getAllPayments());

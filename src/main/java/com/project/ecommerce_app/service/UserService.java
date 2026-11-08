@@ -1,5 +1,7 @@
 package com.project.ecommerce_app.service;
 
+import com.project.ecommerce_app.dto.CustomerDetailsDTO;
+import com.project.ecommerce_app.dto.SellerDetailsDTO;
 import com.project.ecommerce_app.entity.User;
 
 import java.util.List;
@@ -10,6 +12,16 @@ public interface UserService {
     Optional<User> getUserById(Integer userId);
     List<User> getAllUsers();
     User updateUser(Integer userId, User user);
-    void deleteUser(Integer userId);
+
     Optional<User> getUserByEmail(String email);
+
+    List<User> getAllSellers();
+
+    List<User> getAllCustomers();
+
+    void deleteUser(Integer userId);
+
+    List<SellerDetailsDTO> getSellerDetails();
+
+    List<CustomerDetailsDTO> getCustomerDetails();
 }

@@ -15,34 +15,34 @@ public class CartItemController {
 
     private final CartItemService cartItemService;
 
-    // Add a cart item
+    // add a cart item
     @PostMapping("/add")
     public ResponseEntity<CartItem> addCartItem(@RequestBody CartItem cartItem) {
         return ResponseEntity.ok(cartItemService.addCartItem(cartItem));
     }
 
 
-    // Get a cart item by ID
+    // get a cart item by ID
     @GetMapping("/{cartItemId}")
     public ResponseEntity<Optional<CartItem>> getCartItemById(@PathVariable Integer cartItemId) {
         return ResponseEntity.ok(cartItemService.getCartItemById(cartItemId));
     }
 
-    // Remove a cart item
+    // remove a cart item
     @DeleteMapping("/{cartItemId}")
     public ResponseEntity<Void> removeCartItem(@PathVariable Integer cartItemId) {
         cartItemService.removeCartItem(cartItemId);
         return ResponseEntity.noContent().build();
     }
 
-    // Increase quantity (+ button)
+    // increase quantity (+ button)
     @PutMapping("/{cartItemId}/increase")
     public ResponseEntity<Void> increaseQuantity(@PathVariable Integer cartItemId) {
         cartItemService.increaseQuantity(cartItemId);
         return ResponseEntity.ok().build();
     }
 
-    // Decrease quantity (- button)
+    // decrease quantity (- button)
     @PutMapping("/{cartItemId}/decrease")
     public ResponseEntity<Void> decreaseQuantity(@PathVariable Integer cartItemId) {
         cartItemService.decreaseQuantity(cartItemId);

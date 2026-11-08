@@ -32,5 +32,4 @@ public class Cart {
     @JsonManagedReference
     private List<CartItem> cartItems = new ArrayList<>();
 
-//    private double totalPrice;
 }

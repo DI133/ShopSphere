@@ -18,7 +18,7 @@ public class OrderItemController {
     @Autowired
     private OrderItemService orderItemService;
 
-    // Add an order item to an order
+    // add an order item to an order
     @PostMapping("/{orderId}")
     public ResponseEntity<OrderItem> addOrderItem(@PathVariable Integer orderId, @RequestBody OrderItem orderItem) {
 
@@ -26,14 +26,14 @@ public class OrderItemController {
         return ResponseEntity.status(HttpStatus.CREATED).body(savedOrderItem);
     }
 
-    // Get all order items by orderId
+    // get all order items by orderId
     @GetMapping("/{orderId}")
     public ResponseEntity<List<OrderItem>> getOrderItems(@PathVariable Integer orderId) {
         List<OrderItem> orderItems = orderItemService.getOrderItemsByOrderId(orderId);
         return ResponseEntity.ok(orderItems);
     }
 
-    // Remove an order item by orderItemId
+    // remove an order item by orderItemId
     @DeleteMapping("/{orderItemId}")
     public ResponseEntity<Void> removeOrderItem(@PathVariable Integer orderItemId) {
         orderItemService.removeOrderItem(orderItemId);

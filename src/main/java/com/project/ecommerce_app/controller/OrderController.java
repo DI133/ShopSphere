@@ -1,6 +1,7 @@
 package com.project.ecommerce_app.controller;
 
 import com.project.ecommerce_app.dto.AddressDto;
+import com.project.ecommerce_app.dto.SellerOrderItemDto;
 import com.project.ecommerce_app.entity.Order;
 import com.project.ecommerce_app.entity.OrderItem;
 import com.project.ecommerce_app.service.OrderService;
@@ -18,45 +19,48 @@ public class OrderController {
 
     private final OrderService orderService;
 
-    // Place an order
+    // place an order (not used) (see in payment controller)
     @PostMapping("/place/{userId}")
     public ResponseEntity<Order> placeOrder(@PathVariable Integer userId, @RequestBody AddressDto address) {
         return ResponseEntity.ok(orderService.placeOrder(userId, address));
     }
 
-    // Get order by ID
+    // get order by ID
     @GetMapping("/{orderId}")
     public ResponseEntity<Optional<Order>> getOrderById(@PathVariable Integer orderId) {
         return ResponseEntity.ok(orderService.getOrderById(orderId));
     }
 
-    // Get all orders
+    // get all orders
     @GetMapping
     public ResponseEntity<List<Order>> getAllOrders() {
         return ResponseEntity.ok(orderService.getAllOrders());
     }
 
-    // Get all orders of a user
+    // get all orders of a user
     @GetMapping("/user/{userId}")
     public ResponseEntity<List<Order>> getOrdersByUserId(@PathVariable Integer userId) {
         return ResponseEntity.ok(orderService.getOrdersByUserId(userId));
     }
-    // Cancel order
+
+    // cancel order
     @DeleteMapping("/{orderId}/cancel")
     public ResponseEntity<String> cancelOrder(@PathVariable Integer orderId) {
         orderService.cancelOrder(orderId);
         return ResponseEntity.ok("Order Cancelled");
     }
 
+    // see pending orders (used by seller)
     @GetMapping("/orderitems/pending/{sellerId}")
-    public ResponseEntity<List<OrderItem>> getNewOrderItemsForSeller(@PathVariable Integer sellerId){
-        List<OrderItem> items = orderService.getNewOrderItemsForSeller(sellerId);
+    public ResponseEntity<List<SellerOrderItemDto>> getNewOrderItemsForSeller(@PathVariable Integer sellerId){
+        List<SellerOrderItemDto> items = orderService.getNewOrderItemsForSeller(sellerId);
         return ResponseEntity.ok(items);
     }
 
+    // see completed orders (used by seller)
     @GetMapping("/orderitems/completed/{sellerId}")
-    public ResponseEntity<List<OrderItem>> getPastOrderItemsForSeller(@PathVariable Integer sellerId){
-        List<OrderItem> items = orderService.getPastOrderItemsForSeller(sellerId);
+    public ResponseEntity<List<SellerOrderItemDto>> getPastOrderItemsForSeller(@PathVariable Integer sellerId){
+        List<SellerOrderItemDto> items = orderService.getPastOrderItemsForSeller(sellerId);
         return ResponseEntity.ok(items);
     }
 

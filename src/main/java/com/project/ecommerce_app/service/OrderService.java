@@ -1,6 +1,7 @@
 package com.project.ecommerce_app.service;
 
-import com.project.ecommerce_app.dto.AddressDto;
+import com.project.ecommerce_app.dto.*;
+import com.project.ecommerce_app.dto.SellerOrderItemDto;
 import com.project.ecommerce_app.entity.Order;
 import com.project.ecommerce_app.entity.OrderItem;
 
@@ -13,7 +14,7 @@ public interface OrderService {
     List<Order> getAllOrders();
     void cancelOrder(Integer orderId);
     List<Order> getOrdersByUserId(Integer userId);
-    List<OrderItem> getNewOrderItemsForSeller(Integer sellerId);
-    List<OrderItem> getPastOrderItemsForSeller(Integer sellerId);
+    List<SellerOrderItemDto> getNewOrderItemsForSeller(Integer sellerId);
+    List<SellerOrderItemDto> getPastOrderItemsForSeller(Integer sellerId);
     String markOrderItemAsCompleted(Integer orderItemId);
 }

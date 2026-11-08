@@ -14,16 +14,19 @@ public class SearchHistoryController {
     @Autowired
     private SearchHistoryService searchHistoryService;
 
+    // get search history of user
     @GetMapping("/user/{userId}")
     public List<SearchHistory> getHistoryByUserId(@PathVariable Integer userId) {
         return searchHistoryService.getHistoryByUserId(userId);
     }
 
+    // remove history
     @DeleteMapping("/{searchId}")
     public void removeBySearchId(@PathVariable Integer searchId) {
         searchHistoryService.removeBySearchId(searchId);
     }
 
+    // search something
     @PostMapping("/add")
     public SearchHistory addSearchHistory(
             @RequestParam Integer userId,

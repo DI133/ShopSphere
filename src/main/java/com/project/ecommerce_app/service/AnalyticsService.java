@@ -25,7 +25,7 @@ public class AnalyticsService {
         User seller = userRepository.findById(sellerId)
                 .orElseThrow(() -> new RuntimeException("Seller not found"));
 
-        List<Order> deliveredOrders = orderRepository.findByStatus("DELIVERED");
+        List<Order> deliveredOrders = orderRepository.findByStatus(OrderStatus.delivered);
 
         double totalRevenue = 0;
         int totalOrders = 0;
@@ -65,9 +65,13 @@ public class AnalyticsService {
                 .map(e -> new TopProductEntry(e.getKey(), e.getValue()))
                 .collect(Collectors.toList());
 
-        // Create and save SellerStats
-        SellerStats stats = new SellerStats();
-        stats.setUser(seller);
+        SellerStats stats = sellerStatsRepository.findByUser(seller).orElse(null);
+
+        if (stats == null) {
+            stats = new SellerStats();
+            stats.setUser(seller);
+        }
+
         stats.setTotalRevenue(totalRevenue);
         stats.setTotalOrders(totalOrders);
         stats.setTotalItemsSold(totalItemsSold);
@@ -105,7 +109,7 @@ public class AnalyticsService {
 //            sellerStatsRepository.markSellerOrderSeen(sellerId, order.getOrder_id()); // You need to implement this tracking logic
 //        }
 
-        // Update top selling products
+        // Update top-selling products
         List<TopProductEntry> topProducts = stats.getTopSellingProducts();
         boolean found = false;
 
@@ -128,6 +132,12 @@ public class AnalyticsService {
         }
 
         sellerStatsRepository.save(stats);
+    }
+
+    @Transactional
+    public void recalculateSellerStats(Integer sellerId) {
+        // recompute stats from scratch
+        calculateAndSaveSellerStats(sellerId);
     }
 
 

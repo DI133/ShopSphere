@@ -37,37 +37,7 @@ public class CartItemServiceImpl implements CartItemService{
         return cartItemRepository.findById(cartItemId);
     }
 
-//    @Override
-//    public void addToCart(Integer userId, Integer productId, int quantity) {
-//        User user = userRepository.findById(userId)
-//                .orElseThrow(() -> new RuntimeException("User not found"));
-//
-//        // Get or create cart
-//        Cart cart = cartRepository.findByUser(user);
-//        if (cart == null) {
-//            cart = new Cart();
-//            cart.setUser(user);
-//            cart = cartRepository.save(cart);
-//        }
-//
-//        Product product = productRepository.findById(productId)
-//                .orElseThrow(() -> new RuntimeException("Product not found"));
-//
-//        // Check if cartItem already exists
-//        Optional<CartItem> existingCartItem = cartItemRepository.findByCartAndProduct(cart, product);
-//
-//        if (existingCartItem.isPresent()) {
-//            CartItem cartItem = existingCartItem.get();
-//            cartItem.setQuantity(cartItem.getQuantity() + quantity);
-//            cartItemRepository.save(cartItem);
-//        } else {
-//            CartItem cartItem = new CartItem();
-//            cartItem.setCart(cart);
-//            cartItem.setProduct(product);
-//            cartItem.setQuantity(quantity);
-//            cartItemRepository.save(cartItem);
-//        }
-//    }
+
     @Override
     public void removeCartItem(Integer cartItemId) {
         if (cartItemRepository.existsById(cartItemId)) {

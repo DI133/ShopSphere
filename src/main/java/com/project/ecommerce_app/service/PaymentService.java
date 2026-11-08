@@ -10,4 +10,8 @@ public interface PaymentService {
     Payment processPayment(Integer customerId, AddressDto address);
     Optional<Payment> getPaymentById(Integer paymentId);
     List<Payment> getAllPayments();
+
+    Payment markPaymentSuccess(Integer paymentId);
+
+    Payment markPaymentFailed(Integer paymentId);
 }

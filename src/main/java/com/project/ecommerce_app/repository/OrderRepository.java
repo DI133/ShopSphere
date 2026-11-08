@@ -13,7 +13,7 @@ import java.util.List;
 @Repository
 public interface OrderRepository extends JpaRepository<Order, Integer> {
     List<Order> findByUser(User user);
-    List<Order> findByStatus(String status);
+    List<Order> findByStatus(OrderStatus status);
 //    List<Order> findByUser_User_id(Integer userId);
 
 //    @Query("SELECT DISTINCT o FROM Order o JOIN o.orderItems i WHERE i.product.user.user_id = :sellerId AND o.status = :status")
